@@ -4,9 +4,11 @@ import com.fantasmagorica.spring6reactiveexamples.mapper.BeerMapper;
 import com.fantasmagorica.spring6reactiveexamples.model.BeerDTO;
 import com.fantasmagorica.spring6reactiveexamples.service.BeerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -32,7 +34,8 @@ public class BeerController {
 
     @GetMapping(path = {BEER_PATH_ID, BEER_PATH_ID_SLASH})
     Mono<BeerDTO> getBeerById(@PathVariable("beerId") Integer beerId){
-        return beerService.getBeerById(beerId);
+        return beerService.getBeerById(beerId)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }
 
     @PostMapping(path = {BEER_PATH, BEER_PATH_SLASH})
@@ -56,13 +59,16 @@ public class BeerController {
     @PutMapping(path = {BEER_PATH_ID, BEER_PATH_ID_SLASH})
     Mono<ResponseEntity<Void>> updateBeer(@PathVariable("beerId") Integer beerId, @RequestBody @Validated BeerDTO beerDTO){
         return beerService.updateBeer(beerId, beerDTO)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
                 .map(savedDto -> ResponseEntity.noContent().build());
 
     }
 
     @DeleteMapping(path = {BEER_PATH_ID, BEER_PATH_ID_SLASH})
     Mono<ResponseEntity<Void>> deleteBeer(@PathVariable("beerId") Integer beerId){
-        return beerService.deleteBeer(beerId)
+        return beerService.getBeerById(beerId)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
+                .map(beerDTO -> beerService.deleteBeer(beerDTO.getId()))
                 .thenReturn(ResponseEntity.noContent().build());
     }
 }

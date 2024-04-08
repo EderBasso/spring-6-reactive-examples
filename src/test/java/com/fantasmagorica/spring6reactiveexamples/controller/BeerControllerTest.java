@@ -1,5 +1,6 @@
 package com.fantasmagorica.spring6reactiveexamples.controller;
 
+import com.fantasmagorica.spring6reactiveexamples.domain.Beer;
 import com.fantasmagorica.spring6reactiveexamples.model.BeerDTO;
 import com.fantasmagorica.spring6reactiveexamples.repository.BeerRepositoryTest;
 import org.junit.jupiter.api.MethodOrderer;
@@ -69,4 +70,61 @@ class BeerControllerTest {
                 .exchange()
                 .expectStatus().isNoContent();
     }
+
+    @Test
+    @Order(10)
+    void testCreateBeerBadData() {
+        Beer testBeer = BeerRepositoryTest.getTestBeer();
+        testBeer.setBeerName("");
+
+        webTestClient.post().uri(BeerController.BEER_PATH_SLASH)
+                .body(Mono.just(testBeer), BeerDTO.class)
+                .header("Content-type", "application/json")
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Test
+    @Order(11)
+    void testUpdateBeerBadData(){
+        Beer testBeer = BeerRepositoryTest.getTestBeer();
+        testBeer.setBeerStyle("");
+
+        webTestClient.put().uri(BeerController.BEER_PATH_ID_SLASH, 4)
+                .body(Mono.just(testBeer), BeerDTO.class)
+                .header("Content-type", "application/json")
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Test
+    @Order(12)
+    void testUpdateBeerNotFound(){
+        Beer testBeer = BeerRepositoryTest.getTestBeer();
+
+        webTestClient.put().uri(BeerController.BEER_PATH_ID_SLASH, 99)
+                .body(Mono.just(testBeer), BeerDTO.class)
+                .header("Content-type", "application/json")
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    @Order(13)
+    void testGetByIdNotFound() {
+        webTestClient.get().uri(BeerController.BEER_PATH_ID_SLASH, 69)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    @Order(999)
+    void testDeleteBeerNotFound(){
+        webTestClient.delete().uri(BeerController.BEER_PATH_ID_SLASH, 420)
+                .header("Content-type", "application/json")
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+
 }
