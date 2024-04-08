@@ -3,6 +3,8 @@ package com.fantasmagorica.spring6reactiveexamples.repository;
 import com.fantasmagorica.spring6reactiveexamples.bootstrap.BootStrapData;
 import com.fantasmagorica.spring6reactiveexamples.config.DataBaseConfig;
 import com.fantasmagorica.spring6reactiveexamples.domain.Beer;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest;
@@ -36,5 +38,11 @@ class BeerRepositoryTest {
                 .quantityOnHand(8)
                 .upc("123")
                 .build();
+    }
+
+    @Test
+    void testCreateJson() throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        System.out.println(objectMapper.writeValueAsString(getTestBeer()));
     }
 }
