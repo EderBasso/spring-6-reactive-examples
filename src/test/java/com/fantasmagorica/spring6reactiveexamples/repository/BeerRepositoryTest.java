@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DataR2dbcTest
 @Import({DataBaseConfig.class, BootStrapData.class})
-class BeerRepositoryTest {
+public class BeerRepositoryTest {
 
     @Autowired
     BeerRepository beerRepository;
@@ -30,7 +30,7 @@ class BeerRepositoryTest {
         beerRepository.count().subscribe(System.out::println);
     }
 
-    Beer getTestBeer(){
+    public static Beer getTestBeer(){
         return Beer.builder()
                 .beerName("TestBeer")
                 .beerStyle("Pilsner")

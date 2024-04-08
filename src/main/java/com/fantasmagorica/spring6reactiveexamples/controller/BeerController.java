@@ -1,9 +1,7 @@
 package com.fantasmagorica.spring6reactiveexamples.controller;
 
-import com.fantasmagorica.spring6reactiveexamples.domain.Beer;
 import com.fantasmagorica.spring6reactiveexamples.mapper.BeerMapper;
 import com.fantasmagorica.spring6reactiveexamples.model.BeerDTO;
-import com.fantasmagorica.spring6reactiveexamples.repository.BeerRepository;
 import com.fantasmagorica.spring6reactiveexamples.service.BeerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -58,13 +56,13 @@ public class BeerController {
     @PutMapping(path = {BEER_PATH_ID, BEER_PATH_ID_SLASH})
     Mono<ResponseEntity<Void>> updateBeer(@PathVariable("beerId") Integer beerId, @RequestBody @Validated BeerDTO beerDTO){
         return beerService.updateBeer(beerId, beerDTO)
-                .map(savedDto -> ResponseEntity.ok().build());
+                .map(savedDto -> ResponseEntity.noContent().build());
 
     }
 
     @DeleteMapping(path = {BEER_PATH_ID, BEER_PATH_ID_SLASH})
     Mono<ResponseEntity<Void>> deleteBeer(@PathVariable("beerId") Integer beerId){
         return beerService.deleteBeer(beerId)
-                .map(savedDto -> ResponseEntity.noContent().build());
+                .thenReturn(ResponseEntity.noContent().build());
     }
 }
